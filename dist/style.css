@@ -19,7 +19,7 @@ body {
   background-repeat: no-repeat;
   background-size: auto 100vh;
   height: 100vh;
-  padding-left: 120px;
+  padding-left: 100px;
 }
 
 .titleApp {
@@ -43,8 +43,10 @@ body {
   border-radius: 50px;
   cursor: pointer;
   display: flex;
+  justify-content: center;
   background-color: transparent;
   transition: all 0.3s ease;
+  min-width: 160px;
 }
   .button:hover {
     background-color: #663760;
@@ -59,9 +61,20 @@ body {
   align-items: center;
 }
 
+.table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.table th, .table td {
+  border: 1px dotted black;
+  padding: 8px;
+  text-align: center;
+}
+
 .addStartButtonSection {
   display: flex;
-  gap: 50px;
+  gap: 20px;
 }
 
 .buttonSection {
