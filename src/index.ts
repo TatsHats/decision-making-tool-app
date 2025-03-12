@@ -13,10 +13,10 @@ function createApp(): void {
   content.classList.add('content');
   appContainer.append(content);
 
-  const listSection = createListSection();
+  const listSection: HTMLElement = createListSection();
   content.append(listSection);
 
-  const buttonSection = createButtonSection();
+  const buttonSection: HTMLElement = createButtonSection();
   content.append(buttonSection);
 
   document.body.append(appContainer);
@@ -27,39 +27,38 @@ function createListSection(): HTMLElement {
   const listSection = document.createElement('div');
   listSection.classList.add('listSection');
 
-  const taskTable = createTable();
+  const taskTable: HTMLElement = createTable();
   listSection.append(taskTable);
 
-  const addOptionSection = createAddOptionSection();
-  listSection.append(addOptionSection);
-
-  const startButton = document.createElement('button');
-  startButton.textContent = 'Start';
-  startButton.classList.add('startButton', 'button');
-  listSection.append(startButton);
+  const addStartButtonSection: HTMLElement = createAddStartButtonSection();
+  listSection.append(addStartButtonSection);
 
   return listSection;
 }
 
 // createTable
-function createTable() {
+function createTable(): HTMLTableElement {
   const table = document.createElement('table');
   table.classList.add('table');
   return table;
 }
 
 // createAddOptionSection
-function createAddOptionSection() {
-  const addOptionSection = document.createElement('div');
-  
-  const addOptionTitle = document.createElement('h3');
-  addOptionTitle.textContent = 'Add Option';
-  addOptionTitle.classList.add('title');
+function createAddStartButtonSection(): HTMLElement {
+  const addStartButtonSection = document.createElement('div');
+  addStartButtonSection.classList.add('addStartButtonSection');
 
-  const addButton = document.createElement('button');
-  addButton.textContent = '+';
-  addButton.classList.add('addButton');
-  return addOptionSection;
+  const addOptionButton = document.createElement('button');
+  addOptionButton.textContent = 'Add Option';
+  addOptionButton.classList.add('addOptionButton', 'button');
+  addStartButtonSection.append(addOptionButton);
+
+  const startButton = document.createElement('button');
+  startButton.textContent = 'Start';
+  startButton.classList.add('startButton', 'button');
+  addStartButtonSection.append(startButton);
+
+  return addStartButtonSection;
 }
 
 // ------------------- Right - Button Section -------------------

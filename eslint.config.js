@@ -22,6 +22,7 @@ export default [
         location: 'readonly',
         fetch: 'readonly',
         HTMLElement: 'readonly',
+        HTMLTableElement: 'readonly',
       },
     },
 
@@ -37,6 +38,8 @@ export default [
       jsdoc: jsdoc,
     },
 
+    ignores: ['**/dist/**', '**/node_modules/**', '**/webpack.config.js'],
+
     rules: {
       ...js.configs.recommended.rules,
       ...tseslint.configs.recommended.rules,
@@ -50,7 +53,7 @@ export default [
         { assertionStyle: 'never' },
       ],
       '@typescript-eslint/consistent-type-imports': 'error',
-      '@typescript-eslint/explicit-function-return-type': 'off',
+      '@typescript-eslint/explicit-function-return-type': 'error',
       '@typescript-eslint/explicit-member-accessibility': [
         'error',
         { accessibility: 'explicit', overrides: { constructors: 'off' } },

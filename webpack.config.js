@@ -37,16 +37,23 @@ const baseConfig = {
       template: path.resolve(__dirname, 'src/index.html'),
       inject: 'body',
       meta: {
-        'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline';"
-      }
+        'Content-Security-Policy':
+          "default-src 'self'; script-src 'self' 'unsafe-inline';",
+      },
     }),
     new CleanWebpackPlugin(),
     new Dotenv(),
     new MiniCssExtractPlugin({ filename: 'styles.css' }),
     new CopyWebpackPlugin({
       patterns: [
-        { from: path.resolve(__dirname, 'src/style.css'), to: path.resolve(__dirname, 'dist') },
-        { from: path.resolve(__dirname, 'src/assets'), to: path.resolve(__dirname, 'dist/assets') },
+        {
+          from: path.resolve(__dirname, 'src/style.css'),
+          to: path.resolve(__dirname, 'dist'),
+        },
+        {
+          from: path.resolve(__dirname, 'src/assets'),
+          to: path.resolve(__dirname, 'dist/assets'),
+        },
       ],
     }),
   ],

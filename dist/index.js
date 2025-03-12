@@ -1,4 +1,3 @@
-"use strict";
 // -------------- Application container, header and two sections -------------------
 // ------------------- (left with table, right with buttons) -------------------
 function createApp() {
@@ -23,12 +22,8 @@ function createListSection() {
     listSection.classList.add('listSection');
     const taskTable = createTable();
     listSection.append(taskTable);
-    const addOptionSection = createAddOptionSection();
-    listSection.append(addOptionSection);
-    const startButton = document.createElement('button');
-    startButton.textContent = 'Start';
-    startButton.classList.add('startButton', 'button');
-    listSection.append(startButton);
+    const addStartButtonSection = createAddStartButtonSection();
+    listSection.append(addStartButtonSection);
     return listSection;
 }
 // createTable
@@ -38,15 +33,18 @@ function createTable() {
     return table;
 }
 // createAddOptionSection
-function createAddOptionSection() {
-    const addOptionSection = document.createElement('div');
-    const addOptionTitle = document.createElement('h3');
-    addOptionTitle.textContent = 'Add Option';
-    addOptionTitle.classList.add('title');
-    const addButton = document.createElement('button');
-    addButton.textContent = '+';
-    addButton.classList.add('addButton');
-    return addOptionSection;
+function createAddStartButtonSection() {
+    const addStartButtonSection = document.createElement('div');
+    addStartButtonSection.classList.add('addStartButtonSection');
+    const addOptionButton = document.createElement('button');
+    addOptionButton.textContent = 'Add Option';
+    addOptionButton.classList.add('addOptionButton', 'button');
+    addStartButtonSection.append(addOptionButton);
+    const startButton = document.createElement('button');
+    startButton.textContent = 'Start';
+    startButton.classList.add('startButton', 'button');
+    addStartButtonSection.append(startButton);
+    return addStartButtonSection;
 }
 // ------------------- Right - Button Section -------------------
 function createButtonSection() {
