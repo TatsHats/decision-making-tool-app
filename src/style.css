@@ -19,7 +19,7 @@ body {
   background-repeat: no-repeat;
   background-size: auto 100vh;
   height: 100vh;
-  padding-left: 100px;
+  padding-left: 125px;
 }
 
 .titleApp {
@@ -54,11 +54,23 @@ body {
   }
 
 .listSection {
-  min-width: 450px;
+  min-width: 370px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+
+.table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 20px;
+}
+
+.table th, .table td {
+  border: 2px dotted black;
+  padding: 5px;
+  text-align: center;
 }
 
 .addStartButtonSection {
