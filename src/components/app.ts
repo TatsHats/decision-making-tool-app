@@ -8,15 +8,11 @@ export function createApp(): void {
     const appContainer = document.createElement('div');
     appContainer.classList.add('appContainer');
   
-    const content = document.createElement('div');
-    content.classList.add('content');
-    appContainer.append(content);
-  
     const listSection: HTMLElement = createListSection();
-    content.append(listSection);
+    appContainer.append(listSection);
   
     const buttonSection: HTMLElement = createButtonSection();
-    content.append(buttonSection);
+    appContainer.append(buttonSection);
   
     document.body.append(appContainer);
   }

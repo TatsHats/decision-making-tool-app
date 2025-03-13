@@ -5,12 +5,9 @@ import { createButtonSection } from './list-of-buttons.js';
 export function createApp() {
     const appContainer = document.createElement('div');
     appContainer.classList.add('appContainer');
-    const content = document.createElement('div');
-    content.classList.add('content');
-    appContainer.append(content);
     const listSection = createListSection();
-    content.append(listSection);
+    appContainer.append(listSection);
     const buttonSection = createButtonSection();
-    content.append(buttonSection);
+    appContainer.append(buttonSection);
     document.body.append(appContainer);
 }
