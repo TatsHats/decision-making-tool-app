@@ -1,5 +1,6 @@
  // ------------------- Left - List Section -------------------
- let tableBody: HTMLElement;
+ export let tableBody: HTMLElement;
+ let idOptionCount = 0;
  
  export function createListSection(): HTMLElement {
   const listSection = document.createElement('div');
@@ -20,7 +21,7 @@
 }
 
 // createTable
-function createTable(): HTMLTableElement {
+export function createTable(): HTMLTableElement {
   const table = document.createElement('table');
   table.classList.add('table');
 
@@ -45,7 +46,7 @@ function createTable(): HTMLTableElement {
 
   tableBody = document.createElement('tbody');
   table.append(tableBody);
-  tableBody.append(createRow(1, true));
+  tableBody.append(createRow(idOptionCount += 1, true));
 
   return table;
 }
@@ -61,7 +62,7 @@ function createAddStartButtonSection(table: HTMLTableElement): HTMLElement {
   addStartButtonSection.append(addOptionButton);
 
   addOptionButton.addEventListener('click', () => {
-    const newRow = createRow(tableBody.children.length + 1, false);
+    const newRow = createRow(idOptionCount += 1, false);
     tableBody.appendChild(newRow);
   });
 
@@ -73,8 +74,8 @@ function createAddStartButtonSection(table: HTMLTableElement): HTMLElement {
   return addStartButtonSection;
 }
 
-// создание строк
-function createRow(id: number, isFirst: boolean): HTMLTableRowElement {
+// create Rows
+export function createRow(id: number, isFirst: boolean): HTMLTableRowElement {
     const row = document.createElement("tr");
     const idCell = document.createElement('td');
     idCell.textContent = id.toString();

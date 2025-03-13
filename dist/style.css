@@ -15,7 +15,6 @@ body {
 
 .appContainer {
   display: flex;
-  flex-direction: column;
   align-items: center;
   background-image: url('/assets/img/1.png');
   background-position: left top;
@@ -25,12 +24,7 @@ body {
   width: 100%;
   max-width: 1280px;
   min-width: 640px;
-}
-
-.content {
-  display: flex;
-  width: 100%;
-  padding-right: 20px;
+  border: 1px solid black;
   gap: 5%;
 }
 
@@ -58,21 +52,22 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  align-self: flex-start;
   position: relative;
-  margin-left: 175px;
+  margin-left: 155px;
+  min-height: 600px;
 }
 
 .titleApp {
   font-size: 3rem;
   text-align: center;
-  margin: 245px auto 5px;
+  margin: 210px auto 5px;
 }
 
 .table {
   border-collapse: collapse;
   font-size: 24px;
-  margin-bottom: 30px;
-  min-height: 300px;
+  margin-bottom: 10px;
 }
 
 .table-input {
@@ -83,7 +78,7 @@ body {
 }
 
 .title-input {
-  width: 280px;
+  width: 250px;
 }
 
 .weight-input {
