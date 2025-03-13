@@ -5,10 +5,6 @@ import { createButtonSection } from './list-of-buttons.js';
 export function createApp() {
     const appContainer = document.createElement('div');
     appContainer.classList.add('appContainer');
-    const titleApp = document.createElement('h1');
-    titleApp.textContent = 'Decision Making Tool';
-    titleApp.classList.add('titleApp');
-    appContainer.append(titleApp);
     const content = document.createElement('div');
     content.classList.add('content');
     appContainer.append(content);

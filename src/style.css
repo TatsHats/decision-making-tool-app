@@ -27,13 +27,6 @@ body {
   min-width: 640px;
 }
 
-.titleApp {
-  font-size: 3rem;
-  text-align: center;
-  margin: 140px auto 50px;
-  width: 100%;
-}
-
 .content {
   display: flex;
   width: 100%;
@@ -61,7 +54,6 @@ body {
   }
 
 .listSection {
-  min-width: 370px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -70,24 +62,59 @@ body {
   margin-left: 175px;
 }
 
+.titleApp {
+  font-size: 3rem;
+  text-align: center;
+  margin: 245px auto 5px;
+}
+
 .table {
   border-collapse: collapse;
-  font-size: 20px;
-  width: 480px;
-  height: 400px;
-  overflow: hidden;
-  margin-bottom: 50px;
+  font-size: 24px;
+  margin-bottom: 30px;
+  min-height: 300px;
+}
+
+.table-input {
+  font-family: Birthstone-Regular, sans-serif;
+  font-size: 24px;
+  background: transparent;
+  border: none;
+}
+
+.title-input {
+  width: 280px;
+}
+
+.weight-input {
+  width: 80px;
+}
+
+.table-input:focus {
+  outline: none;
 }
 
 .table th, .table td {
-  border: 2px dotted black;
   padding: 5px;
-  text-align: center;
+  text-align: left;
+  vertical-align: top;
 }
 
-.table tbody tr {
-  height: 40px;
+.table tbody tr, .table tbody td {
+  height: 30px;
 }
+
+.deleteButton {
+  background: none;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+  .deleteButton:hover {
+    color: rgb(155, 6, 6);
+    font-weight: bolder;
+  }
 
 .addStartButtonSection {
   display: flex;

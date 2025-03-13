@@ -1,12 +1,19 @@
  // ------------------- Left - List Section -------------------
+ let tableBody: HTMLElement;
+ 
  export function createListSection(): HTMLElement {
   const listSection = document.createElement('div');
   listSection.classList.add('listSection');
+  
+  const titleApp = document.createElement('h1');
+  titleApp.textContent = 'Decision Making Tool';
+  titleApp.classList.add('titleApp');
+  listSection.append(titleApp);
 
-  const taskTable: HTMLElement = createTable();
+  const taskTable: HTMLTableElement = createTable();
   listSection.append(taskTable);
 
-  const addStartButtonSection: HTMLElement = createAddStartButtonSection();
+  const addStartButtonSection: HTMLElement = createAddStartButtonSection(taskTable);
   listSection.append(addStartButtonSection);
 
   return listSection;
@@ -29,33 +36,22 @@ function createTable(): HTMLTableElement {
   const weightTask = document.createElement('th');
   weightTask.textContent = 'Task weight';
 
-  headerRow.append(idTask, titleTask, weightTask);
+  const deleteTask = document.createElement('th');
+  deleteTask.textContent = '';
+
+  headerRow.append(idTask, titleTask, weightTask, deleteTask);
   tableHead.append(headerRow);
   table.append(tableHead);
 
-  const tableBody = document.createElement('tbody');
-
-  for (let i = 0; i < 10; i++) {
-    const row = document.createElement('tr');
-    const idCell = document.createElement('td');
-    const titleCell = document.createElement('td');
-    const weightCell = document.createElement('td');
-  
-    idCell.textContent = '';
-    titleCell.textContent = '';
-    weightCell.textContent = '';
-
-    row.append(idCell, titleCell, weightCell);
-    tableBody.appendChild(row);
-  }
-
+  tableBody = document.createElement('tbody');
   table.append(tableBody);
+  tableBody.append(createRow(1, true));
 
   return table;
 }
 
 // createAddOptionSection
-function createAddStartButtonSection(): HTMLElement {
+function createAddStartButtonSection(table: HTMLTableElement): HTMLElement {
   const addStartButtonSection = document.createElement('div');
   addStartButtonSection.classList.add('addStartButtonSection');
 
@@ -64,10 +60,63 @@ function createAddStartButtonSection(): HTMLElement {
   addOptionButton.classList.add('addOptionButton', 'button');
   addStartButtonSection.append(addOptionButton);
 
+  addOptionButton.addEventListener('click', () => {
+    const newRow = createRow(tableBody.children.length + 1, false);
+    tableBody.appendChild(newRow);
+  });
+
   const startButton = document.createElement('button');
   startButton.textContent = 'Start';
   startButton.classList.add('startButton', 'button');
   addStartButtonSection.append(startButton);
 
   return addStartButtonSection;
+}
+
+// создание строк
+function createRow(id: number, isFirst: boolean): HTMLTableRowElement {
+    const row = document.createElement("tr");
+    const idCell = document.createElement('td');
+    idCell.textContent = id.toString();
+
+    const titleCell = document.createElement('td');
+    const titleInput = createInputElement("text", "Title", isFirst ? "Title" : "");
+    titleInput.classList.add("title-input");
+    titleCell.appendChild(titleInput);
+
+    const weightCell = document.createElement('td');
+    const weightInput = createInputElement("number", "Weight", isFirst ? "Weight" : "");
+    weightInput.classList.add("weight-input");
+    weightCell.appendChild(weightInput);
+
+    const deleteCell = document.createElement('td');
+    const deleteButton = createDeleteButton();
+    deleteCell.appendChild(deleteButton);
+
+    row.append(idCell, titleCell, weightCell, deleteCell);
+
+    deleteButton.addEventListener('click', () => {
+        row.remove();
+    });
+
+    return row;
+}
+
+function createInputElement(type: string, placeholder: string, value: string): HTMLInputElement {
+    const input = document.createElement("input");
+    input.classList.add("table-input");
+    input.type = type;
+    input.placeholder = placeholder;
+    input.value = value;
+
+    return input;
+}
+
+function createDeleteButton(): HTMLButtonElement {
+    const deleteButton = document.createElement("button");
+    deleteButton.textContent = "X";
+    deleteButton.title = "delete this task";
+    deleteButton.classList.add("deleteButton");
+
+    return deleteButton;
 }
