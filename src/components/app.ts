@@ -1,5 +1,5 @@
 import { createListSection } from './list-of-options.js'
-import { createButtonSection } from './list-of-options.js'
+import { createButtonSection } from './list-of-buttons.js'
 
 
 // -------------- Application container, header and two sections -------------------
