@@ -1,5 +1,5 @@
-import { tableBody } from "./list-of-options.js";
-import { createRow } from "./list-of-options.js";
+import { tableBody } from './list-of-options.js';
+import { createRow } from './list-of-options.js';
 // ------------------- Right - Button Section -------------------
 export function createButtonSection() {
     const buttonSection = document.createElement('div');
@@ -28,7 +28,7 @@ export function createButtonSection() {
 function clearTable() {
     if (tableBody) {
         while (tableBody.firstChild) {
-            tableBody.removeChild(tableBody.firstChild);
+            tableBody.firstChild.remove();
         }
         tableBody.append(createRow(1, true));
     }

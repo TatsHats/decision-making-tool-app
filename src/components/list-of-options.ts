@@ -1,11 +1,26 @@
- // ------------------- Left - List Section -------------------
- export let tableBody: HTMLElement;
- let idOptionCount = 0;
- 
- export function createListSection(): HTMLElement {
+// -------------- Application container, header and two sections -------------------
+// ------------------- (left with table, right with buttons) -------------------
+export function createApp(): void {
+  const appContainer = document.createElement('div');
+  appContainer.classList.add('appContainer');
+
+  const listSection: HTMLElement = createListSection();
+  appContainer.append(listSection);
+
+  const buttonSection: HTMLElement = createButtonSection();
+  appContainer.append(buttonSection);
+
+  document.body.append(appContainer);
+}
+
+// ------------------- Left - List Section -------------------
+let tableBody: HTMLElement;
+let idOptionCount = 0;
+
+function createListSection(): HTMLElement {
   const listSection = document.createElement('div');
   listSection.classList.add('listSection');
-  
+
   const titleApp = document.createElement('h1');
   titleApp.textContent = 'Decision Making Tool';
   titleApp.classList.add('titleApp');
@@ -14,14 +29,15 @@
   const taskTable: HTMLTableElement = createTable();
   listSection.append(taskTable);
 
-  const addStartButtonSection: HTMLElement = createAddStartButtonSection(taskTable);
+  const addStartButtonSection: HTMLElement =
+    createAddStartButtonSection(taskTable);
   listSection.append(addStartButtonSection);
 
   return listSection;
 }
 
 // createTable
-export function createTable(): HTMLTableElement {
+function createTable(): HTMLTableElement {
   const table = document.createElement('table');
   table.classList.add('table');
 
@@ -32,7 +48,7 @@ export function createTable(): HTMLTableElement {
   idTask.textContent = 'ID';
 
   const titleTask = document.createElement('th');
-  titleTask.textContent = 'Task title'
+  titleTask.textContent = 'Task title';
 
   const weightTask = document.createElement('th');
   weightTask.textContent = 'Task weight';
@@ -46,7 +62,7 @@ export function createTable(): HTMLTableElement {
 
   tableBody = document.createElement('tbody');
   table.append(tableBody);
-  tableBody.append(createRow(idOptionCount += 1, true));
+  tableBody.append(createRow((idOptionCount += 1), true));
 
   return table;
 }
@@ -62,8 +78,8 @@ function createAddStartButtonSection(table: HTMLTableElement): HTMLElement {
   addStartButtonSection.append(addOptionButton);
 
   addOptionButton.addEventListener('click', () => {
-    const newRow = createRow(idOptionCount += 1, false);
-    tableBody.appendChild(newRow);
+    const newRow = createRow((idOptionCount += 1), false);
+    tableBody.append(newRow);
   });
 
   const startButton = document.createElement('button');
@@ -75,49 +91,103 @@ function createAddStartButtonSection(table: HTMLTableElement): HTMLElement {
 }
 
 // create Rows
-export function createRow(id: number, isFirst: boolean): HTMLTableRowElement {
-    const row = document.createElement("tr");
-    const idCell = document.createElement('td');
-    idCell.textContent = id.toString();
+function createRow(id: number, isFirst: boolean): HTMLTableRowElement {
+  const row = document.createElement('tr');
+  const idCell = document.createElement('td');
+  idCell.textContent = id.toString();
 
-    const titleCell = document.createElement('td');
-    const titleInput = createInputElement("text", "Title", isFirst ? "Title" : "");
-    titleInput.classList.add("title-input");
-    titleCell.appendChild(titleInput);
+  const titleCell = document.createElement('td');
+  const titleInput = createInputElement(
+    'text',
+    'Title',
+    isFirst ? 'Title' : '',
+  );
+  titleInput.classList.add('title-input');
+  titleCell.append(titleInput);
 
-    const weightCell = document.createElement('td');
-    const weightInput = createInputElement("number", "Weight", isFirst ? "Weight" : "");
-    weightInput.classList.add("weight-input");
-    weightCell.appendChild(weightInput);
+  const weightCell = document.createElement('td');
+  const weightInput = createInputElement(
+    'number',
+    'Weight',
+    isFirst ? 'Weight' : '',
+  );
+  weightInput.classList.add('weight-input');
+  weightCell.append(weightInput);
 
-    const deleteCell = document.createElement('td');
-    const deleteButton = createDeleteButton();
-    deleteCell.appendChild(deleteButton);
+  const deleteCell = document.createElement('td');
+  const deleteButton = createDeleteButton();
+  deleteCell.append(deleteButton);
 
-    row.append(idCell, titleCell, weightCell, deleteCell);
+  row.append(idCell, titleCell, weightCell, deleteCell);
 
-    deleteButton.addEventListener('click', () => {
-        row.remove();
-    });
+  deleteButton.addEventListener('click', () => {
+    row.remove();
+  });
 
-    return row;
+  return row;
 }
 
-function createInputElement(type: string, placeholder: string, value: string): HTMLInputElement {
-    const input = document.createElement("input");
-    input.classList.add("table-input");
-    input.type = type;
-    input.placeholder = placeholder;
-    input.value = value;
+export function createInputElement(
+  type: string,
+  placeholder: string,
+  value: string,
+): HTMLInputElement {
+  const input = document.createElement('input');
+  input.classList.add('table-input');
+  input.type = type;
+  input.placeholder = placeholder;
+  input.value = value;
 
-    return input;
+  return input;
 }
 
 function createDeleteButton(): HTMLButtonElement {
-    const deleteButton = document.createElement("button");
-    deleteButton.textContent = "X";
-    deleteButton.title = "delete this task";
-    deleteButton.classList.add("deleteButton");
+  const deleteButton = document.createElement('button');
+  deleteButton.textContent = 'X';
+  deleteButton.title = 'delete this task';
+  deleteButton.classList.add('deleteButton');
 
-    return deleteButton;
+  return deleteButton;
+}
+
+// ------------------- Right - Button Section -------------------
+function createButtonSection(): HTMLElement {
+  const buttonSection = document.createElement('div');
+  buttonSection.classList.add('buttonSection');
+
+  const pasteButton = document.createElement('button');
+  pasteButton.textContent = 'Paste list';
+  pasteButton.classList.add('pasteButton', 'button');
+  buttonSection.append(pasteButton);
+
+  const clearButton = document.createElement('button');
+  clearButton.textContent = 'Clear list';
+  clearButton.classList.add('clearButton', 'button');
+  buttonSection.append(clearButton);
+
+  const saveButton = document.createElement('button');
+  saveButton.textContent = 'Save list to file';
+  saveButton.classList.add('saveButton', 'button');
+  buttonSection.append(saveButton);
+
+  const loadButton = document.createElement('button');
+  loadButton.textContent = 'Load list from file';
+  loadButton.classList.add('loadButton', 'button');
+  buttonSection.append(loadButton);
+
+  clearButton.addEventListener('click', () => {
+    clearTable();
+  });
+
+  return buttonSection;
+}
+
+function clearTable(): void {
+  if (tableBody) {
+    while (tableBody.firstChild) {
+      tableBody.firstChild.remove();
+    }
+
+    tableBody.append(createRow(1, true));
+  }
 }
