@@ -1,5 +1,7 @@
-import { createApp } from './components/list-of-options.js';
+import { changePage } from './router.js';
+import { Page } from './router.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-  createApp();
+  changePage(Page.List);
+  console.log(`page: ${Page.List}`);
 });

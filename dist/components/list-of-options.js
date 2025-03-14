@@ -1,13 +1,14 @@
+import { Page, changePage } from "../router.js";
 // -------------- Application container, header and two sections -------------------
 // ------------------- (left with table, right with buttons) -------------------
-export function createApp() {
-    const appContainer = document.createElement('div');
-    appContainer.classList.add('appContainer');
+export function createListOfOptions() {
+    const container = document.createElement('div');
+    container.classList.add('appContainer');
     const listSection = createListSection();
-    appContainer.append(listSection);
+    container.append(listSection);
     const buttonSection = createButtonSection();
-    appContainer.append(buttonSection);
-    document.body.append(appContainer);
+    container.append(buttonSection);
+    return container;
 }
 // ------------------- Left - List Section -------------------
 let tableBody;
@@ -63,6 +64,9 @@ function createAddStartButtonSection(table) {
     startButton.textContent = 'Start';
     startButton.classList.add('startButton', 'button');
     addStartButtonSection.append(startButton);
+    startButton.addEventListener('click', () => {
+        changePage(Page.Picker);
+    });
     return addStartButtonSection;
 }
 // create Rows

@@ -1,6 +1,8 @@
 import { createInputElement } from './list-of-options.js';
 
 export function createDecisionPicker(): HTMLElement {
+  console.log('Creating Decision Picker page');
+
   const sectionPicker = document.createElement('div');
   sectionPicker.classList.add('sectionPicker');
 
@@ -17,14 +19,17 @@ export function createDecisionPicker(): HTMLElement {
   // Buttons
   const backButton = document.createElement('button');
   backButton.textContent = 'Back';
+  backButton.classList.add('button');
   backButton.addEventListener('click', () => {});
 
   const soundButton = document.createElement('button');
-  backButton.textContent = 'Sound';
-  backButton.addEventListener('click', () => {});
+  soundButton.textContent = 'Sound';
+  soundButton.classList.add('button');
+  soundButton.addEventListener('click', () => {});
 
   const spinButton = document.createElement('button');
   spinButton.textContent = 'Spin';
+  spinButton.classList.add('button');
   spinButton.addEventListener('click', () => {});
 
   // Input time
