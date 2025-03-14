@@ -1,8 +1,4 @@
-import { createInputElement } from './list-of-options.js';
-
 export function createDecisionPicker(): HTMLElement {
-  console.log('Creating Decision Picker page');
-
   const sectionPicker = document.createElement('div');
   sectionPicker.classList.add('sectionPicker');
 
@@ -11,7 +7,7 @@ export function createDecisionPicker(): HTMLElement {
   titleApp.classList.add('titleApp');
 
   const sectionPickerSettings = document.createElement('div');
-  sectionPickerSettings.classList.add('sectionPickerButtons');
+  sectionPickerSettings.classList.add('sectionPickerSettings');
 
   const wheelCanvas = document.createElement('canvas');
   wheelCanvas.classList.add('wheelCanvas');
@@ -19,28 +15,54 @@ export function createDecisionPicker(): HTMLElement {
   // Buttons
   const backButton = document.createElement('button');
   backButton.textContent = 'Back';
-  backButton.classList.add('button');
+  backButton.classList.add('buttonPicker');
   backButton.addEventListener('click', () => {});
-
-  const soundButton = document.createElement('button');
-  soundButton.textContent = 'Sound';
-  soundButton.classList.add('button');
-  soundButton.addEventListener('click', () => {});
 
   const spinButton = document.createElement('button');
   spinButton.textContent = 'Spin';
-  spinButton.classList.add('button');
+  spinButton.classList.add('buttonPicker', 'spinButton');
   spinButton.addEventListener('click', () => {});
 
-  // Input time
-  const duration = createInputElement('number', 'sec', '10');
+  const soundButton = document.createElement('button');
+  soundButton.textContent = 'Sound';
+  soundButton.classList.add('buttonPicker');
+  soundButton.addEventListener('click', () => {});
 
+  // Input time
+  const duration = document.createElement('div');
+  duration.classList.add('duration');
+  const label = document.createElement('label');
+  label.textContent = 'Duration: ';
+  label.setAttribute('for', 'duration');
+  const input = document.createElement('input');
+  input.classList.add('durationInput');
+  input.id = 'duration';
+  input.type = 'number';
+  input.placeholder = 'sec';
+  input.value = '10';
+  duration.append(label, input);
+
+  // info field
   const infoField = document.createElement('span');
-  backButton.textContent = 'Press stat button';
+  infoField.textContent = 'Press start button';
   infoField.classList.add('infoField');
 
-  sectionPickerSettings.append(backButton, soundButton, spinButton, duration);
-  sectionPicker.append(titleApp, sectionPickerSettings, infoField, wheelCanvas);
+  sectionPickerSettings.append(backButton, spinButton, soundButton);
+  sectionPicker.append(
+    titleApp,
+    sectionPickerSettings,
+    duration,
+    infoField,
+    wheelCanvas,
+  );
 
   return sectionPicker;
+}
+
+function getRandomColor(): string {
+  return `rgb(
+    ${Math.floor(Math.random() * 256)}, 
+    ${Math.floor(Math.random() * 256)}, 
+    ${Math.floor(Math.random() * 256)}
+    )`;
 }

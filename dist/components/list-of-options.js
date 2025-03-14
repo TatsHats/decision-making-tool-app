@@ -1,4 +1,4 @@
-import { Page, changePage } from "../router.js";
+import { Page, changePage } from '../router.js';
 // -------------- Application container, header and two sections -------------------
 // ------------------- (left with table, right with buttons) -------------------
 export function createListOfOptions() {
@@ -12,7 +12,8 @@ export function createListOfOptions() {
 }
 // ------------------- Left - List Section -------------------
 let tableBody;
-let idOptionCount = 0;
+let idOptionCount = 1;
+export let optionsArray = [];
 function createListSection() {
     const listSection = document.createElement('div');
     listSection.classList.add('listSection');
@@ -45,7 +46,7 @@ function createTable() {
     table.append(tableHead);
     tableBody = document.createElement('tbody');
     table.append(tableBody);
-    tableBody.append(createRow((idOptionCount += 1), true));
+    tableBody.append(createRow(idOptionCount, true));
     return table;
 }
 // createAddOptionSection
@@ -65,7 +66,7 @@ function createAddStartButtonSection(table) {
     startButton.classList.add('startButton', 'button');
     addStartButtonSection.append(startButton);
     startButton.addEventListener('click', () => {
-        changePage(Page.Picker);
+        optionsChecking();
     });
     return addStartButtonSection;
 }
@@ -82,16 +83,33 @@ function createRow(id, isFirst) {
     const weightInput = createInputElement('number', 'Weight', isFirst ? 'Weight' : '');
     weightInput.classList.add('weight-input');
     weightCell.append(weightInput);
+    titleInput.addEventListener('input', () => {
+        updateoptionsArray(id, titleInput.value, Number.parseInt(weightInput.value));
+    });
+    weightInput.addEventListener('input', () => {
+        updateoptionsArray(id, titleInput.value, Number.parseInt(weightInput.value));
+    });
+    updateoptionsArray(id, titleInput.value, Number.parseInt(weightInput.value));
     const deleteCell = document.createElement('td');
     const deleteButton = createDeleteButton();
     deleteCell.append(deleteButton);
     row.append(idCell, titleCell, weightCell, deleteCell);
     deleteButton.addEventListener('click', () => {
         row.remove();
+        removeOption(id);
     });
     return row;
 }
-export function createInputElement(type, placeholder, value) {
+function clearTable() {
+    if (tableBody) {
+        while (tableBody.firstChild) {
+            tableBody.firstChild.remove();
+        }
+        optionsArray = [];
+        tableBody.append(createRow(1, true));
+    }
+}
+function createInputElement(type, placeholder, value) {
     const input = document.createElement('input');
     input.classList.add('table-input');
     input.type = type;
@@ -105,6 +123,33 @@ function createDeleteButton() {
     deleteButton.title = 'delete this task';
     deleteButton.classList.add('deleteButton');
     return deleteButton;
+}
+function updateoptionsArray(id, title, weight) {
+    const currentOption = optionsArray.find((element) => element.id === id);
+    if (Number.isNaN(weight) || weight <= 0)
+        return;
+    if (currentOption) {
+        currentOption.title = title;
+        currentOption.weight = weight;
+    }
+    else {
+        optionsArray.push({
+            id: id,
+            title: title,
+            weight: weight,
+        });
+    }
+}
+function removeOption(id) {
+    optionsArray = optionsArray.filter((element) => element.id !== id);
+}
+function optionsChecking() {
+    const validOptions = optionsArray.filter((option) => option.title.trim() && option.weight > 0 && !Number.isNaN(option.weight));
+    if (validOptions.length < 2) {
+        alert('Please fill options.');
+        return;
+    }
+    changePage(Page.Picker);
 }
 // ------------------- Right - Button Section -------------------
 function createButtonSection() {
@@ -130,12 +175,4 @@ function createButtonSection() {
         clearTable();
     });
     return buttonSection;
-}
-function clearTable() {
-    if (tableBody) {
-        while (tableBody.firstChild) {
-            tableBody.firstChild.remove();
-        }
-        tableBody.append(createRow(1, true));
-    }
 }

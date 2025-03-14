@@ -1,4 +1,4 @@
-import { Page, changePage } from "../router.js";
+import { Page, changePage } from '../router.js';
 
 // -------------- Application container, header and two sections -------------------
 // ------------------- (left with table, right with buttons) -------------------
@@ -17,7 +17,12 @@ export function createListOfOptions(): HTMLElement {
 
 // ------------------- Left - List Section -------------------
 let tableBody: HTMLElement;
-let idOptionCount = 0;
+let idOptionCount = 1;
+export let optionsArray: {
+  id: number;
+  title: string;
+  weight: number;
+}[] = [];
 
 function createListSection(): HTMLElement {
   const listSection = document.createElement('div');
@@ -64,7 +69,7 @@ function createTable(): HTMLTableElement {
 
   tableBody = document.createElement('tbody');
   table.append(tableBody);
-  tableBody.append(createRow((idOptionCount += 1), true));
+  tableBody.append(createRow(idOptionCount, true));
 
   return table;
 }
@@ -89,9 +94,9 @@ function createAddStartButtonSection(table: HTMLTableElement): HTMLElement {
   startButton.classList.add('startButton', 'button');
   addStartButtonSection.append(startButton);
   startButton.addEventListener('click', () => {
-    changePage(Page.Picker);
+    optionsChecking();
   });
-  
+
   return addStartButtonSection;
 }
 
@@ -119,6 +124,22 @@ function createRow(id: number, isFirst: boolean): HTMLTableRowElement {
   weightInput.classList.add('weight-input');
   weightCell.append(weightInput);
 
+  titleInput.addEventListener('input', () => {
+    updateoptionsArray(
+      id,
+      titleInput.value,
+      Number.parseInt(weightInput.value),
+    );
+  });
+  weightInput.addEventListener('input', () => {
+    updateoptionsArray(
+      id,
+      titleInput.value,
+      Number.parseInt(weightInput.value),
+    );
+  });
+  updateoptionsArray(id, titleInput.value, Number.parseInt(weightInput.value));
+
   const deleteCell = document.createElement('td');
   const deleteButton = createDeleteButton();
   deleteCell.append(deleteButton);
@@ -127,12 +148,24 @@ function createRow(id: number, isFirst: boolean): HTMLTableRowElement {
 
   deleteButton.addEventListener('click', () => {
     row.remove();
+    removeOption(id);
   });
 
   return row;
 }
 
-export function createInputElement(
+function clearTable(): void {
+  if (tableBody) {
+    while (tableBody.firstChild) {
+      tableBody.firstChild.remove();
+    }
+
+    optionsArray = [];
+    tableBody.append(createRow(1, true));
+  }
+}
+
+function createInputElement(
   type: string,
   placeholder: string,
   value: string,
@@ -153,6 +186,41 @@ function createDeleteButton(): HTMLButtonElement {
   deleteButton.classList.add('deleteButton');
 
   return deleteButton;
+}
+
+function updateoptionsArray(id: number, title: string, weight: number): void {
+  const currentOption = optionsArray.find((element) => element.id === id);
+
+  if (Number.isNaN(weight) || weight <= 0) return;
+
+  if (currentOption) {
+    currentOption.title = title;
+    currentOption.weight = weight;
+  } else {
+    optionsArray.push({
+      id: id,
+      title: title,
+      weight: weight,
+    });
+  }
+}
+
+function removeOption(id: number): void {
+  optionsArray = optionsArray.filter((element) => element.id !== id);
+}
+
+function optionsChecking(): void {
+  const validOptions = optionsArray.filter(
+    (option) =>
+      option.title.trim() && option.weight > 0 && !Number.isNaN(option.weight),
+  );
+
+  if (validOptions.length < 2) {
+    alert('Please fill options.');
+    return;
+  }
+
+  changePage(Page.Picker);
 }
 
 // ------------------- Right - Button Section -------------------
@@ -185,14 +253,4 @@ function createButtonSection(): HTMLElement {
   });
 
   return buttonSection;
-}
-
-function clearTable(): void {
-  if (tableBody) {
-    while (tableBody.firstChild) {
-      tableBody.firstChild.remove();
-    }
-
-    tableBody.append(createRow(1, true));
-  }
 }
