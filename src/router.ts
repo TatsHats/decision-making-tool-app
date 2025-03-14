@@ -13,10 +13,8 @@ export function changePage(page: Page): void {
   appContainer.replaceChildren();
 
   if (page === Page.List) {
-    console.log('Rendering List page');
     appContainer.append(createListOfOptions());
   } else if (page === Page.Picker) {
-    console.log('Rendering Picker page');
     appContainer.append(createDecisionPicker());
   }
 }
