@@ -15,7 +15,6 @@ body {
 
 .appContainer {
   display: flex;
-  align-items: center;
   background-image: url('/assets/img/1.png');
   background-position: left top;
   background-repeat: no-repeat;
@@ -51,11 +50,11 @@ body {
 .listSection {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: start;
   align-items: center;
   align-self: flex-start;
   position: relative;
-  margin: 100px 0 0 155px;
+  margin: 160px 0 0 125px;
   min-height: 600px;
 }
 
@@ -66,7 +65,11 @@ body {
 }
 
 .table {
+  width: 100%;
+  max-width: 400px;
+  height: 340px;
   border-collapse: collapse;
+  overflow-y: auto;
   font-size: 24px;
   margin-bottom: 10px;
 }
@@ -79,7 +82,7 @@ body {
 }
 
 .title-input {
-  width: 250px;
+  width: 220px;
 }
 
 .weight-input {
@@ -100,10 +103,10 @@ body {
   text-align: left;
   vertical-align: top;
 }
-
-.table tbody tr, .table tbody td {
-  height: 30px;
-}
+  .table th:nth-child(-n+4) {
+    border-bottom: 1px solid black;
+    border-top: 1px solid black;
+  }
 
 .deleteButton {
   background: none;
@@ -120,6 +123,8 @@ body {
 .addStartButtonSection {
   display: flex;
   gap: 20px;
+  position: sticky;
+  bottom: 0;
 }
 
 .buttonSection {
