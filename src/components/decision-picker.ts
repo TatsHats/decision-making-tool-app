@@ -1,4 +1,17 @@
 import { optionsArray } from './list-of-options.js';
+import { Page, changePage } from '../router.js';
+
+let isSoundOn = true;
+
+enum SoundType {
+  Start = 'start',
+  Finish = 'finish',
+}
+
+const sounds: Record<SoundType, HTMLAudioElement> = {
+  [SoundType.Start]: new Audio('./assets/sounds/start.mpeg'),
+  [SoundType.Finish]: new Audio('./assets/sounds/finish.mpeg'),
+};
 
 export function createDecisionPicker(): HTMLElement {
   const sectionPicker = document.createElement('div');
@@ -15,23 +28,15 @@ export function createDecisionPicker(): HTMLElement {
   wheelCanvas.classList.add('wheelCanvas');
   drawDiagram(wheelCanvas, optionsArray);
 
-  // Buttons
+  // Back
   const backButton = document.createElement('button');
   backButton.textContent = 'Back';
   backButton.classList.add('buttonPicker');
-  backButton.addEventListener('click', () => {});
+  backButton.addEventListener('click', () => {
+    changePage(Page.List);
+  });
 
-  const spinButton = document.createElement('button');
-  spinButton.textContent = 'Spin';
-  spinButton.classList.add('buttonPicker', 'spinButton');
-  spinButton.addEventListener('click', () => {});
-
-  const soundButton = document.createElement('button');
-  soundButton.textContent = 'Sound';
-  soundButton.classList.add('buttonPicker');
-  soundButton.addEventListener('click', () => {});
-
-  // Input time
+  // Input rotation time
   const duration = document.createElement('div');
   duration.classList.add('duration');
   const label = document.createElement('label');
@@ -44,6 +49,28 @@ export function createDecisionPicker(): HTMLElement {
   input.placeholder = 'sec';
   input.value = '10';
   duration.append(label, input);
+
+  // Button spin diagram
+  const spinButton = document.createElement('button');
+  spinButton.textContent = 'Spin';
+  spinButton.classList.add('buttonPicker', 'spinButton');
+  spinButton.addEventListener('click', () => {
+    playSound(SoundType.Start);
+    setTimeout(
+      () => {
+        playSound(SoundType.Finish);
+      },
+      Number.parseFloat(input.value) * 1000,
+    );
+  });
+
+  const soundButton = document.createElement('button');
+  soundButton.textContent = 'Sound';
+  soundButton.classList.add('buttonPicker');
+  soundButton.addEventListener('click', () => {
+    isSoundOn = !isSoundOn;
+    soundButton.textContent = isSoundOn ? 'Sound On' : 'Sound Off';
+  });
 
   // info field
   const infoField = document.createElement('span');
@@ -130,4 +157,9 @@ function drawDiagram(
     context.arc(centerX, centerY, radius, 0, Math.PI * 2);
     context.stroke();
   }
+}
+
+function playSound(soundType: SoundType): void {
+  if (!isSoundOn) return;
+  sounds[soundType]?.play();
 }
