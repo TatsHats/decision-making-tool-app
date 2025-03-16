@@ -23,7 +23,7 @@ function createListSection() {
     listSection.append(titleApp);
     const taskTable = createTable();
     listSection.append(taskTable);
-    const addStartButtonSection = createAddStartButtonSection(taskTable);
+    const addStartButtonSection = createAddStartButtonSection();
     listSection.append(addStartButtonSection);
     return listSection;
 }
@@ -50,7 +50,7 @@ function createTable() {
     return table;
 }
 // createAddOptionSection
-function createAddStartButtonSection(table) {
+function createAddStartButtonSection() {
     const addStartButtonSection = document.createElement('div');
     addStartButtonSection.classList.add('addStartButtonSection');
     const addOptionButton = document.createElement('button');

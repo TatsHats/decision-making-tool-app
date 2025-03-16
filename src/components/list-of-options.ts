@@ -36,8 +36,7 @@ function createListSection(): HTMLElement {
   const taskTable: HTMLTableElement = createTable();
   listSection.append(taskTable);
 
-  const addStartButtonSection: HTMLElement =
-    createAddStartButtonSection(taskTable);
+  const addStartButtonSection: HTMLElement = createAddStartButtonSection();
   listSection.append(addStartButtonSection);
 
   return listSection;
@@ -75,7 +74,7 @@ function createTable(): HTMLTableElement {
 }
 
 // createAddOptionSection
-function createAddStartButtonSection(table: HTMLTableElement): HTMLElement {
+function createAddStartButtonSection(): HTMLElement {
   const addStartButtonSection = document.createElement('div');
   addStartButtonSection.classList.add('addStartButtonSection');
 
