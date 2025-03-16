@@ -1,5 +1,9 @@
 import { optionsArray } from './list-of-options.js';
 import { Page, changePage } from '../router.js';
+// ------------------------ global variables ---------------------------
+let infoField = document.createElement('span');
+infoField.textContent = 'Press start button';
+infoField.classList.add('infoField');
 let isSoundOn = true;
 var SoundType;
 (function (SoundType) {
@@ -7,9 +11,17 @@ var SoundType;
     SoundType["Finish"] = "finish";
 })(SoundType || (SoundType = {}));
 const sounds = {
-    [SoundType.Start]: new Audio('./assets/sounds/start.mpeg'),
-    [SoundType.Finish]: new Audio('./assets/sounds/finish.mpeg'),
+    [SoundType.Start]: new Audio('./assets/sounds/start.mp3'),
+    [SoundType.Finish]: new Audio('./assets/sounds/finish.mp3'),
 };
+var StateDecisionPicker;
+(function (StateDecisionPicker) {
+    StateDecisionPicker["Initial"] = "initial";
+    StateDecisionPicker["Picking"] = "picking";
+    StateDecisionPicker["Picked"] = "picked";
+})(StateDecisionPicker || (StateDecisionPicker = {}));
+let currentState = StateDecisionPicker.Initial;
+//-----------------------------------------------------------------------
 export function createDecisionPicker() {
     const sectionPicker = document.createElement('div');
     sectionPicker.classList.add('sectionPicker');
@@ -18,6 +30,10 @@ export function createDecisionPicker() {
     titleApp.classList.add('titleApp');
     const sectionPickerSettings = document.createElement('div');
     sectionPickerSettings.classList.add('sectionPickerSettings');
+    const arrow = document.createElement('img');
+    arrow.classList.add('imgArrow');
+    arrow.src = './assets/img/arrow2.png';
+    arrow.alt = 'Arrow immage';
     const wheelCanvas = document.createElement('canvas');
     wheelCanvas.classList.add('wheelCanvas');
     drawDiagram(wheelCanvas, optionsArray);
@@ -46,11 +62,13 @@ export function createDecisionPicker() {
     spinButton.textContent = 'Spin';
     spinButton.classList.add('buttonPicker', 'spinButton');
     spinButton.addEventListener('click', () => {
-        playSound(SoundType.Start);
+        changeState(StateDecisionPicker.Picking, spinButton, backButton, soundButton, input, label);
+        playAnimation(wheelCanvas, Number.parseFloat(input.value));
         setTimeout(() => {
-            playSound(SoundType.Finish);
+            changeState(StateDecisionPicker.Picked, spinButton, backButton, soundButton, input, label);
         }, Number.parseFloat(input.value) * 1000);
     });
+    // button on/off sound
     const soundButton = document.createElement('button');
     soundButton.textContent = 'Sound';
     soundButton.classList.add('buttonPicker');
@@ -58,12 +76,8 @@ export function createDecisionPicker() {
         isSoundOn = !isSoundOn;
         soundButton.textContent = isSoundOn ? 'Sound On' : 'Sound Off';
     });
-    // info field
-    const infoField = document.createElement('span');
-    infoField.textContent = 'Press start button';
-    infoField.classList.add('infoField');
     sectionPickerSettings.append(backButton, spinButton, soundButton);
-    sectionPicker.append(titleApp, sectionPickerSettings, duration, infoField, wheelCanvas);
+    sectionPicker.append(titleApp, sectionPickerSettings, duration, infoField, arrow, wheelCanvas);
     return sectionPicker;
 }
 function getRandomColor() {
@@ -72,7 +86,7 @@ function getRandomColor() {
     ${Math.floor(Math.random() * 200) + 56}, 
     ${Math.floor(Math.random() * 200) + 56}, 
     ${Math.floor(Math.random() * 200) + 56}
-    )`;
+  )`;
 }
 function drawDiagram(canvas, optionsArray) {
     const context = canvas.getContext('2d');
@@ -81,8 +95,8 @@ function drawDiagram(canvas, optionsArray) {
     canvas.height = 300;
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
-    const totalWeight = optionsArray.reduce((sum, element) => sum + element.weight, 0);
     let startSector = 0;
+    const totalWeight = getTotalWeight(optionsArray);
     if (!context)
         return;
     context.clearRect(0, 0, canvas.width, canvas.height);
@@ -114,6 +128,11 @@ function drawDiagram(canvas, optionsArray) {
         context.fillStyle = 'white';
         context.arc(centerX, centerY, 20, 0, Math.PI * 2);
         context.fill();
+        context.beginPath();
+        context.lineWidth = 1;
+        context.strokeStyle = 'black';
+        context.arc(centerX, centerY, 20, 0, Math.PI * 2);
+        context.stroke();
         // edge of the circle
         context.beginPath();
         context.lineWidth = 3;
@@ -127,4 +146,61 @@ function playSound(soundType) {
     if (!isSoundOn)
         return;
     (_a = sounds[soundType]) === null || _a === void 0 ? void 0 : _a.play();
+}
+function playAnimation(canvas, duration) {
+    if (duration < 5) {
+        return alert('The duration must be at least 5 seconds!');
+    }
+    playSound(SoundType.Start);
+    const startAngle = Math.random() * 360;
+    const totalRotation = 360 * 5 + Math.random() * 3600;
+    canvas.style.transition = `transform ${duration}s ease-out`;
+    canvas.style.transform = `rotate(${startAngle + totalRotation}deg)`;
+    console.log(`${totalRotation} -||- ${canvas.style.transform}`);
+    const endAngle = (startAngle + totalRotation) % 360;
+    setTimeout(() => {
+        playSound(SoundType.Finish);
+        updateInfoField(infoField, endAngle);
+    }, duration * 1000);
+}
+function updateInfoField(infoField, rotation) {
+    const totalWeight = getTotalWeight(optionsArray);
+    let startSector = 0;
+    const radian = (rotation % 360) * (Math.PI / 180);
+    for (const option of optionsArray) {
+        const sectorSize = Math.PI * 2 * (option.weight / totalWeight);
+        const endSector = startSector + sectorSize;
+        if (radian >= startSector && radian < endSector) {
+            infoField.textContent = `${option.title}`;
+            break;
+        }
+        startSector = endSector;
+    }
+}
+function getTotalWeight(optionsArray) {
+    const totalWeight = optionsArray.reduce((sum, element) => sum + element.weight, 0);
+    return totalWeight;
+}
+function changeState(newState, spinButton, backButton, soundButton, input, label) {
+    currentState = newState;
+    const isDisabled = currentState === StateDecisionPicker.Picking;
+    spinButton.disabled = isDisabled;
+    backButton.disabled = isDisabled;
+    soundButton.disabled = isDisabled;
+    input.disabled = isDisabled;
+    label.classList.toggle('disabled', isDisabled);
+    if (isDisabled) {
+        spinButton.classList.add('disabled');
+        backButton.classList.add('disabled');
+        soundButton.classList.add('disabled');
+        input.classList.add('disabled');
+        label.classList.add('disabled');
+    }
+    else {
+        spinButton.classList.remove('disabled');
+        backButton.classList.remove('disabled');
+        soundButton.classList.remove('disabled');
+        input.classList.remove('disabled');
+        label.classList.remove('disabled');
+    }
 }
