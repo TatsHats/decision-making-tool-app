@@ -36,6 +36,7 @@ export default [
         HTMLCanvasElement: 'readonly',
         Storage: 'readonly',
         console: 'readonly',
+        HTMLDialogElement: 'readonly',
       },
     },
 
