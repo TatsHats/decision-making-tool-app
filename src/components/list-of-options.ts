@@ -1,5 +1,22 @@
 import { Page, changePage } from '../router.js';
 import { createPasteListModal } from './paste-list-modal.js';
+import { createAddValidOptionsModal } from './add-valid-options-modal.js';
+import DataStorage from './storage-handler.js';
+
+// ------------------------ global variables ---------------------------
+
+let savedOptions: { id: number; title: string; weight: number }[] = [];
+let tableBody: HTMLElement;
+
+const storage = new DataStorage(localStorage);
+const STORAGE_KEY = 'optionsData';
+
+export let idOptionCount = 1;
+export let optionsArray: {
+  id: number;
+  title: string;
+  weight: number;
+}[] = [];
 
 // -------------- Application container, header and two sections -------------------
 // ------------------- (left with table, right with buttons) -------------------
@@ -17,14 +34,6 @@ export function createListOfOptions(): HTMLElement {
 }
 
 // ------------------- Left - List Section -------------------
-let tableBody: HTMLElement;
-let idOptionCount = 1;
-export let optionsArray: {
-  id: number;
-  title: string;
-  weight: number;
-}[] = [];
-
 function createListSection(): HTMLElement {
   const listSection = document.createElement('div');
   listSection.classList.add('listSection');
@@ -44,7 +53,7 @@ function createListSection(): HTMLElement {
 }
 
 // createTable
-function createTable(): HTMLTableElement {
+export function createTable(): HTMLTableElement {
   const table = document.createElement('table');
   table.classList.add('table');
 
@@ -69,7 +78,17 @@ function createTable(): HTMLTableElement {
 
   tableBody = document.createElement('tbody');
   table.append(tableBody);
-  tableBody.append(createRow(idOptionCount, true));
+
+  if (Array.isArray(savedOptions) && savedOptions.length > 0) {
+    for (const option of savedOptions) {
+      tableBody.append(
+        createRow(option.id, option.title, option.weight.toString()),
+      );
+    }
+  } else {
+    tableBody.append(createRow(idOptionCount, '', ''));
+    idOptionCount += 1;
+  }
 
   return table;
 }
@@ -85,8 +104,9 @@ function createAddStartButtonSection(): HTMLElement {
   addStartButtonSection.append(addOptionButton);
 
   addOptionButton.addEventListener('click', () => {
-    const newRow = createRow((idOptionCount += 1), false);
+    const newRow = createRow(idOptionCount);
     tableBody.append(newRow);
+    idOptionCount += 1;
   });
 
   const startButton = document.createElement('button');
@@ -101,44 +121,42 @@ function createAddStartButtonSection(): HTMLElement {
 }
 
 // create Rows
-function createRow(id: number, isFirst: boolean): HTMLTableRowElement {
+export function createRow(
+  id: number,
+  title: string = '',
+  weight: string = '',
+): HTMLTableRowElement {
   const row = document.createElement('tr');
   const idCell = document.createElement('td');
   idCell.textContent = id.toString();
 
   const titleCell = document.createElement('td');
-  const titleInput = createInputElement(
-    'text',
-    'Title',
-    isFirst ? 'Title' : '',
-  );
+  const titleInput = createInputElement('text', 'Title', title);
   titleInput.classList.add('title-input');
   titleCell.append(titleInput);
 
   const weightCell = document.createElement('td');
-  const weightInput = createInputElement(
-    'number',
-    'Weight',
-    isFirst ? 'Weight' : '',
-  );
+  const weightInput = createInputElement('number', 'Weight', weight.toString());
   weightInput.classList.add('weight-input');
   weightCell.append(weightInput);
 
   titleInput.addEventListener('input', () => {
-    updateoptionsArray(
+    updateOptionsArray(
       id,
       titleInput.value,
       Number.parseInt(weightInput.value),
     );
   });
+
   weightInput.addEventListener('input', () => {
-    updateoptionsArray(
+    updateOptionsArray(
       id,
       titleInput.value,
       Number.parseInt(weightInput.value),
     );
   });
-  updateoptionsArray(id, titleInput.value, Number.parseInt(weightInput.value));
+
+  updateOptionsArray(id, titleInput.value, Number.parseInt(weightInput.value));
 
   const deleteCell = document.createElement('td');
   const deleteButton = createDeleteButton();
@@ -161,7 +179,8 @@ function clearTable(): void {
     }
 
     optionsArray = [];
-    tableBody.append(createRow(1, true));
+    storage.remove(STORAGE_KEY);
+    idOptionCount = 1;
   }
 }
 
@@ -188,7 +207,7 @@ function createDeleteButton(): HTMLButtonElement {
   return deleteButton;
 }
 
-function updateoptionsArray(id: number, title: string, weight: number): void {
+function updateOptionsArray(id: number, title: string, weight: number): void {
   const currentOption = optionsArray.find((element) => element.id === id);
 
   if (Number.isNaN(weight) || weight <= 0) return;
@@ -203,10 +222,18 @@ function updateoptionsArray(id: number, title: string, weight: number): void {
       weight: weight,
     });
   }
+
+  saveOptions();
+  savedOptions = [...optionsArray];
 }
 
 function removeOption(id: number): void {
   optionsArray = optionsArray.filter((element) => element.id !== id);
+  saveOptions();
+
+  if (tableBody.children.length === 0) {
+    idOptionCount = 1;
+  }
 }
 
 function optionsChecking(): void {
@@ -216,7 +243,9 @@ function optionsChecking(): void {
   );
 
   if (validOptions.length < 2) {
-    alert('Please fill options.');
+    const pasteAddModal = createAddValidOptionsModal();
+    const { openModal } = pasteAddModal;
+    openModal();
     return;
   }
 
@@ -233,7 +262,7 @@ function createButtonSection(): HTMLElement {
   pasteButton.classList.add('pasteButton', 'button');
   buttonSection.append(pasteButton);
 
-  const pasteListModal = createPasteListModal();
+  const pasteListModal = createPasteListModal(createRow, tableBody);
   const { openModal } = pasteListModal;
   pasteButton.addEventListener('click', () => {
     openModal();
@@ -260,3 +289,40 @@ function createButtonSection(): HTMLElement {
 
   return buttonSection;
 }
+
+function saveOptions(): void {
+  storage.save(STORAGE_KEY, optionsArray);
+}
+
+savedOptions =
+  storage.load(STORAGE_KEY, (data) => {
+    if (Array.isArray(data)) {
+      return data.filter(
+        (item): item is { id: number; title: string; weight: number } =>
+          typeof item.id === 'number' &&
+          typeof item.title === 'string' &&
+          typeof item.weight === 'number',
+      );
+    }
+
+    return [];
+  }) ?? [];
+
+if (Array.isArray(savedOptions) && savedOptions.length > 0) {
+  optionsArray = savedOptions;
+  let maxId = 0;
+  for (const option of optionsArray) {
+    if (option.id > maxId) {
+      maxId = option.id;
+    }
+  }
+  idOptionCount = maxId + 1;
+} else {
+  optionsArray = [];
+  idOptionCount = 1;
+}
+
+window.addEventListener('beforeunload', () => {
+  console.log('Saving options...');
+  storage.save(STORAGE_KEY, optionsArray);
+});

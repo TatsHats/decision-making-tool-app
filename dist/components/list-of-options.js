@@ -1,5 +1,15 @@
+var _a;
 import { Page, changePage } from '../router.js';
 import { createPasteListModal } from './paste-list-modal.js';
+import { createAddValidOptionsModal } from './add-valid-options-modal.js';
+import DataStorage from './storage-handler.js';
+// ------------------------ global variables ---------------------------
+let savedOptions = [];
+let tableBody;
+const storage = new DataStorage(localStorage);
+const STORAGE_KEY = 'optionsData';
+export let idOptionCount = 1;
+export let optionsArray = [];
 // -------------- Application container, header and two sections -------------------
 // ------------------- (left with table, right with buttons) -------------------
 export function createListOfOptions() {
@@ -12,9 +22,6 @@ export function createListOfOptions() {
     return container;
 }
 // ------------------- Left - List Section -------------------
-let tableBody;
-let idOptionCount = 1;
-export let optionsArray = [];
 function createListSection() {
     const listSection = document.createElement('div');
     listSection.classList.add('listSection');
@@ -29,7 +36,7 @@ function createListSection() {
     return listSection;
 }
 // createTable
-function createTable() {
+export function createTable() {
     const table = document.createElement('table');
     table.classList.add('table');
     const tableHead = document.createElement('thead');
@@ -47,7 +54,15 @@ function createTable() {
     table.append(tableHead);
     tableBody = document.createElement('tbody');
     table.append(tableBody);
-    tableBody.append(createRow(idOptionCount, true));
+    if (Array.isArray(savedOptions) && savedOptions.length > 0) {
+        for (const option of savedOptions) {
+            tableBody.append(createRow(option.id, option.title, option.weight.toString()));
+        }
+    }
+    else {
+        tableBody.append(createRow(idOptionCount, '', ''));
+        idOptionCount += 1;
+    }
     return table;
 }
 // createAddOptionSection
@@ -59,8 +74,9 @@ function createAddStartButtonSection() {
     addOptionButton.classList.add('addOptionButton', 'button');
     addStartButtonSection.append(addOptionButton);
     addOptionButton.addEventListener('click', () => {
-        const newRow = createRow((idOptionCount += 1), false);
+        const newRow = createRow(idOptionCount);
         tableBody.append(newRow);
+        idOptionCount += 1;
     });
     const startButton = document.createElement('button');
     startButton.textContent = 'Start';
@@ -72,25 +88,25 @@ function createAddStartButtonSection() {
     return addStartButtonSection;
 }
 // create Rows
-function createRow(id, isFirst) {
+export function createRow(id, title = '', weight = '') {
     const row = document.createElement('tr');
     const idCell = document.createElement('td');
     idCell.textContent = id.toString();
     const titleCell = document.createElement('td');
-    const titleInput = createInputElement('text', 'Title', isFirst ? 'Title' : '');
+    const titleInput = createInputElement('text', 'Title', title);
     titleInput.classList.add('title-input');
     titleCell.append(titleInput);
     const weightCell = document.createElement('td');
-    const weightInput = createInputElement('number', 'Weight', isFirst ? 'Weight' : '');
+    const weightInput = createInputElement('number', 'Weight', weight.toString());
     weightInput.classList.add('weight-input');
     weightCell.append(weightInput);
     titleInput.addEventListener('input', () => {
-        updateoptionsArray(id, titleInput.value, Number.parseInt(weightInput.value));
+        updateOptionsArray(id, titleInput.value, Number.parseInt(weightInput.value));
     });
     weightInput.addEventListener('input', () => {
-        updateoptionsArray(id, titleInput.value, Number.parseInt(weightInput.value));
+        updateOptionsArray(id, titleInput.value, Number.parseInt(weightInput.value));
     });
-    updateoptionsArray(id, titleInput.value, Number.parseInt(weightInput.value));
+    updateOptionsArray(id, titleInput.value, Number.parseInt(weightInput.value));
     const deleteCell = document.createElement('td');
     const deleteButton = createDeleteButton();
     deleteCell.append(deleteButton);
@@ -107,7 +123,8 @@ function clearTable() {
             tableBody.firstChild.remove();
         }
         optionsArray = [];
-        tableBody.append(createRow(1, true));
+        storage.remove(STORAGE_KEY);
+        idOptionCount = 1;
     }
 }
 function createInputElement(type, placeholder, value) {
@@ -125,7 +142,7 @@ function createDeleteButton() {
     deleteButton.classList.add('deleteButton');
     return deleteButton;
 }
-function updateoptionsArray(id, title, weight) {
+function updateOptionsArray(id, title, weight) {
     const currentOption = optionsArray.find((element) => element.id === id);
     if (Number.isNaN(weight) || weight <= 0)
         return;
@@ -140,14 +157,22 @@ function updateoptionsArray(id, title, weight) {
             weight: weight,
         });
     }
+    saveOptions();
+    savedOptions = [...optionsArray];
 }
 function removeOption(id) {
     optionsArray = optionsArray.filter((element) => element.id !== id);
+    saveOptions();
+    if (tableBody.children.length === 0) {
+        idOptionCount = 1;
+    }
 }
 function optionsChecking() {
     const validOptions = optionsArray.filter((option) => option.title.trim() && option.weight > 0 && !Number.isNaN(option.weight));
     if (validOptions.length < 2) {
-        alert('Please fill options.');
+        const pasteAddModal = createAddValidOptionsModal();
+        const { openModal } = pasteAddModal;
+        openModal();
         return;
     }
     changePage(Page.Picker);
@@ -160,7 +185,7 @@ function createButtonSection() {
     pasteButton.textContent = 'Paste list';
     pasteButton.classList.add('pasteButton', 'button');
     buttonSection.append(pasteButton);
-    const pasteListModal = createPasteListModal();
+    const pasteListModal = createPasteListModal(createRow, tableBody);
     const { openModal } = pasteListModal;
     pasteButton.addEventListener('click', () => {
         openModal();
@@ -182,3 +207,33 @@ function createButtonSection() {
     });
     return buttonSection;
 }
+function saveOptions() {
+    storage.save(STORAGE_KEY, optionsArray);
+}
+savedOptions =
+    (_a = storage.load(STORAGE_KEY, (data) => {
+        if (Array.isArray(data)) {
+            return data.filter((item) => typeof item.id === 'number' &&
+                typeof item.title === 'string' &&
+                typeof item.weight === 'number');
+        }
+        return [];
+    })) !== null && _a !== void 0 ? _a : [];
+if (Array.isArray(savedOptions) && savedOptions.length > 0) {
+    optionsArray = savedOptions;
+    let maxId = 0;
+    for (const option of optionsArray) {
+        if (option.id > maxId) {
+            maxId = option.id;
+        }
+    }
+    idOptionCount = maxId + 1;
+}
+else {
+    optionsArray = [];
+    idOptionCount = 1;
+}
+window.addEventListener('beforeunload', () => {
+    console.log('Saving options...');
+    storage.save(STORAGE_KEY, optionsArray);
+});

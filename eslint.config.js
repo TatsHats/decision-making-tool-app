@@ -37,6 +37,7 @@ export default [
         Storage: 'readonly',
         console: 'readonly',
         HTMLDialogElement: 'readonly',
+        HTMLTextAreaElement: 'readonly',
       },
     },
 

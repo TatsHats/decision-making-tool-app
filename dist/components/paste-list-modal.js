@@ -1,24 +1,27 @@
+import { optionsArray, idOptionCount } from './list-of-options.js';
 function openModal(modalWindow) {
     document.body.append(modalWindow);
     modalWindow.showModal();
     document.body.style.overflow = 'hidden';
 }
-function closeModal(modalWindow) {
+function closeModal(modalWindow, pasteField) {
     modalWindow.close();
     document.body.style.overflow = 'auto';
     modalWindow.remove();
+    pasteField.value = '';
 }
-export function createPasteListModal() {
+export function createPasteListModal(createRow, tableBody) {
+    let localId = idOptionCount;
     const modalWindow = document.createElement('dialog');
     modalWindow.classList.add('modal');
     modalWindow.addEventListener('click', (event) => {
         if (event.target === modalWindow) {
-            closeModal(modalWindow);
+            closeModal(modalWindow, pasteField);
         }
     });
     document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape' && modalWindow.open) {
-            closeModal(modalWindow);
+            closeModal(modalWindow, pasteField);
         }
     });
     const modalContent = document.createElement('div');
@@ -30,14 +33,19 @@ export function createPasteListModal() {
     confirmButton.textContent = 'Confirm';
     confirmButton.classList.add('modalButton');
     confirmButton.addEventListener('click', () => {
-        addOptionsToList(parseCSV(pasteField.value));
-        closeModal(modalWindow);
+        const parsedOptions = parseCSV(pasteField.value);
+        for (const option of parsedOptions) {
+            if (isValidOption(option)) {
+                localId = addOptionToTable(option, createRow, tableBody, localId);
+            }
+        }
+        closeModal(modalWindow, pasteField);
     });
     const cancelButton = document.createElement('button');
     cancelButton.textContent = 'Cancel';
     cancelButton.classList.add('modalButton');
     cancelButton.addEventListener('click', () => {
-        closeModal(modalWindow);
+        closeModal(modalWindow, pasteField);
     });
     const modalButtons = document.createElement('div');
     modalButtons.classList.add('modalButtons');
@@ -46,12 +54,20 @@ export function createPasteListModal() {
     modalButtons.append(confirmButton, cancelButton);
     return {
         openModal: () => openModal(modalWindow),
-        closeModal: () => closeModal(modalWindow),
+        closeModal: () => closeModal(modalWindow, pasteField),
     };
 }
-const optionsList = [];
-function addOptionsToList(options) {
-    optionsList.push(...options);
+function addOptionToTable(option, createRow, tableBody, idOptionCount) {
+    const newId = idOptionCount + 1;
+    const newOption = {
+        id: newId,
+        title: option.option,
+        weight: Number(option.value),
+    };
+    optionsArray.push(newOption);
+    const row = createRow(newOption.id, newOption.title, newOption.weight.toString());
+    tableBody.append(row);
+    return newId;
 }
 function parseCSV(csvText) {
     return csvText
@@ -61,4 +77,9 @@ function parseCSV(csvText) {
         const [option, value] = line.split(',').map((item) => item.trim());
         return option && value ? [{ option, value }] : [];
     });
+}
+function isValidOption(option) {
+    return (option.option.trim() !== '' &&
+        !Number.isNaN(Number(option.value)) &&
+        Number(option.value) > 0);
 }

@@ -1,6 +1,6 @@
 @font-face {
     font-family: 'Birthstone-Regular';
-    src: url('/assets/fonts/Birthstone-Regular.ttf') format('truetype');
+    src: url('./assets/fonts/Birthstone-Regular.ttf') format('truetype');
 }
 
 body {
@@ -15,7 +15,7 @@ body {
 
 .appContainer {
   display: flex;
-  background-image: url('/assets/img/1.png');
+  background-image: url('./assets/img/1.png');
   background-position: left top;
   background-repeat: no-repeat;
   background-size: cover;
@@ -136,7 +136,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-image: url('/assets/img/1.png');
+  background-image: url('./assets/img/1.png');
   background-position: left top;
   background-repeat: no-repeat;
   background-size: cover;
@@ -203,6 +203,7 @@ body {
   padding: 0 10px;
   font-size: 2em;
   text-align: center;
+  height: 40px;
 }
 
 .duration {
@@ -266,16 +267,19 @@ body {
   margin: 10% auto;
   width: 550px;
   height: 400px;
-  display: block;
+  display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
 .pasteField {
+  padding: 5px;
+  font-size: 1.2em;
   width: 524px;
   height: 240px;
   margin: 10px;
+  box-sizing: border-box;
 }
 
 .modalButtons {
@@ -302,3 +306,37 @@ body {
     background-color: rgba(102, 55, 96, 0.5);
     color: white;
   }
+
+.modalAddValid {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  border: 1px solid black;
+  background-color: rgba(66, 33, 62, 0.7);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 500px;
+  height: 300px;
+  z-index: 1000;
+}
+.modalAddValidContent {
+  background-color: rgb(232, 231, 231, 0.8);
+  border: 1px solid black;
+  margin: 10% auto;
+  width: 450px;
+  height: 150px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.modalLabel {
+  font-family: 'Times New Roman', Times, sans-serif;
+  font-size: 1.5em;
+  text-align: center;
+  margin: 20px 30px;
+}

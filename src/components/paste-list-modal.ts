@@ -1,29 +1,41 @@
+import { optionsArray, idOptionCount } from './list-of-options.js';
+
 function openModal(modalWindow: HTMLDialogElement): void {
   document.body.append(modalWindow);
   modalWindow.showModal();
   document.body.style.overflow = 'hidden';
 }
 
-function closeModal(modalWindow: HTMLDialogElement): void {
+function closeModal(
+  modalWindow: HTMLDialogElement,
+  pasteField: HTMLTextAreaElement,
+): void {
   modalWindow.close();
   document.body.style.overflow = 'auto';
   modalWindow.remove();
+  pasteField.value = '';
 }
 
-export function createPasteListModal(): {
+type CreateRowType = (id: number, title: string, weight: string) => HTMLElement;
+export function createPasteListModal(
+  createRow: CreateRowType,
+  tableBody: HTMLElement,
+): {
   openModal: () => void;
   closeModal: () => void;
 } {
+  let localId = idOptionCount;
+
   const modalWindow = document.createElement('dialog');
   modalWindow.classList.add('modal');
   modalWindow.addEventListener('click', (event) => {
     if (event.target === modalWindow) {
-      closeModal(modalWindow);
+      closeModal(modalWindow, pasteField);
     }
   });
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape' && modalWindow.open) {
-      closeModal(modalWindow);
+      closeModal(modalWindow, pasteField);
     }
   });
 
@@ -38,15 +50,20 @@ export function createPasteListModal(): {
   confirmButton.textContent = 'Confirm';
   confirmButton.classList.add('modalButton');
   confirmButton.addEventListener('click', () => {
-    addOptionsToList(parseCSV(pasteField.value));
-    closeModal(modalWindow);
+    const parsedOptions = parseCSV(pasteField.value);
+    for (const option of parsedOptions) {
+      if (isValidOption(option)) {
+        localId = addOptionToTable(option, createRow, tableBody, localId);
+      }
+    }
+    closeModal(modalWindow, pasteField);
   });
 
   const cancelButton = document.createElement('button');
   cancelButton.textContent = 'Cancel';
   cancelButton.classList.add('modalButton');
   cancelButton.addEventListener('click', () => {
-    closeModal(modalWindow);
+    closeModal(modalWindow, pasteField);
   });
 
   const modalButtons = document.createElement('div');
@@ -58,14 +75,34 @@ export function createPasteListModal(): {
 
   return {
     openModal: () => openModal(modalWindow),
-    closeModal: () => closeModal(modalWindow),
+    closeModal: () => closeModal(modalWindow, pasteField),
   };
 }
 
-const optionsList = [];
+function addOptionToTable(
+  option: { option: string; value: string },
+  createRow: CreateRowType,
+  tableBody: HTMLElement,
+  idOptionCount: number,
+): number {
+  const newId = idOptionCount + 1;
 
-function addOptionsToList(options: { option: string; value: string }[]): void {
-  optionsList.push(...options);
+  const newOption = {
+    id: newId,
+    title: option.option,
+    weight: Number(option.value),
+  };
+
+  optionsArray.push(newOption);
+
+  const row = createRow(
+    newOption.id,
+    newOption.title,
+    newOption.weight.toString(),
+  );
+  tableBody.append(row);
+
+  return newId;
 }
 
 function parseCSV(csvText: string): { option: string; value: string }[] {
@@ -76,4 +113,12 @@ function parseCSV(csvText: string): { option: string; value: string }[] {
       const [option, value] = line.split(',').map((item) => item.trim());
       return option && value ? [{ option, value }] : [];
     });
+}
+
+function isValidOption(option: { option: string; value: string }): boolean {
+  return (
+    option.option.trim() !== '' &&
+    !Number.isNaN(Number(option.value)) &&
+    Number(option.value) > 0
+  );
 }

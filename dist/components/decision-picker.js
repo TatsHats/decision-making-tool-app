@@ -1,27 +1,31 @@
 import { optionsArray } from './list-of-options.js';
 import { Page, changePage } from '../router.js';
 // ------------------------ global variables ---------------------------
-let infoField = document.createElement('span');
-infoField.textContent = 'Press start button';
-infoField.classList.add('infoField');
-let isSoundOn = true;
 var SoundType;
 (function (SoundType) {
     SoundType["Start"] = "start";
     SoundType["Finish"] = "finish";
 })(SoundType || (SoundType = {}));
-const sounds = {
-    [SoundType.Start]: new Audio('./assets/sounds/start.mp3'),
-    [SoundType.Finish]: new Audio('./assets/sounds/finish.mp3'),
-};
-var StateDecisionPicker;
+export var StateDecisionPicker;
 (function (StateDecisionPicker) {
     StateDecisionPicker["Initial"] = "initial";
     StateDecisionPicker["Picking"] = "picking";
     StateDecisionPicker["Picked"] = "picked";
 })(StateDecisionPicker || (StateDecisionPicker = {}));
 let currentState = StateDecisionPicker.Initial;
+let isSoundOn = true;
+let infoField = document.createElement('span');
+infoField.textContent = 'Press start button';
+infoField.classList.add('infoField');
+const soundMuteState = localStorage.getItem('muteState');
+const sounds = {
+    [SoundType.Start]: new Audio('./assets/sounds/start.mp3'),
+    [SoundType.Finish]: new Audio('./assets/sounds/finish.mp3'),
+};
 //-----------------------------------------------------------------------
+if (soundMuteState !== null) {
+    isSoundOn = soundMuteState === 'true';
+}
 export function createDecisionPicker() {
     const sectionPicker = document.createElement('div');
     sectionPicker.classList.add('sectionPicker');
@@ -70,11 +74,12 @@ export function createDecisionPicker() {
     });
     // button on/off sound
     const soundButton = document.createElement('button');
-    soundButton.textContent = 'Sound';
+    updateSoundButtonState(soundButton);
     soundButton.classList.add('buttonPicker');
     soundButton.addEventListener('click', () => {
         isSoundOn = !isSoundOn;
-        soundButton.textContent = isSoundOn ? 'Sound On' : 'Sound Off';
+        updateSoundButtonState(soundButton);
+        localStorage.setItem('muteState', isSoundOn.toString());
     });
     sectionPickerSettings.append(backButton, spinButton, soundButton);
     sectionPicker.append(titleApp, sectionPickerSettings, duration, infoField, arrow, wheelCanvas);
@@ -91,8 +96,9 @@ function getRandomColor() {
 function drawDiagram(canvas, optionsArray) {
     const context = canvas.getContext('2d');
     const radius = 150;
-    canvas.width = 300;
-    canvas.height = 300;
+    const diameter = 300;
+    canvas.width = diameter;
+    canvas.height = diameter;
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
     let startSector = 0;
@@ -124,14 +130,15 @@ function drawDiagram(canvas, optionsArray) {
         // start for next sector
         startSector = endSector;
         // center of the circle
+        const radiusCenter = 20;
         context.beginPath();
         context.fillStyle = 'white';
-        context.arc(centerX, centerY, 20, 0, Math.PI * 2);
+        context.arc(centerX, centerY, radiusCenter, 0, Math.PI * 2);
         context.fill();
         context.beginPath();
         context.lineWidth = 1;
         context.strokeStyle = 'black';
-        context.arc(centerX, centerY, 20, 0, Math.PI * 2);
+        context.arc(centerX, centerY, radiusCenter, 0, Math.PI * 2);
         context.stroke();
         // edge of the circle
         context.beginPath();
@@ -203,4 +210,9 @@ function changeState(newState, spinButton, backButton, soundButton, input, label
         input.classList.remove('disabled');
         label.classList.remove('disabled');
     }
+}
+function updateSoundButtonState(button) {
+    button.textContent = isSoundOn ? 'Sound On' : 'Sound Off';
+    button.classList.toggle('soundOn', isSoundOn);
+    button.classList.toggle('soundOff', !isSoundOn);
 }
