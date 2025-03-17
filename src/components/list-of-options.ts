@@ -1,4 +1,5 @@
 import { Page, changePage } from '../router.js';
+import { createPasteListModal } from './paste-list-modal.js';
 
 // -------------- Application container, header and two sections -------------------
 // ------------------- (left with table, right with buttons) -------------------
@@ -231,6 +232,12 @@ function createButtonSection(): HTMLElement {
   pasteButton.textContent = 'Paste list';
   pasteButton.classList.add('pasteButton', 'button');
   buttonSection.append(pasteButton);
+
+  const pasteListModal = createPasteListModal();
+  const { openModal } = pasteListModal;
+  pasteButton.addEventListener('click', () => {
+    openModal();
+  });
 
   const clearButton = document.createElement('button');
   clearButton.textContent = 'Clear list';
