@@ -14,14 +14,14 @@ class DataStorage {
         try {
             const data = this.storage.getItem(key);
             if (data === null)
-                return;
+                return undefined;
             const parsed = JSON.parse(data);
             assertIsValid(parsed);
             return parsed;
         }
         catch (error) {
             console.error('Load error:', error);
-            return;
+            return undefined;
         }
     }
     remove(key) {

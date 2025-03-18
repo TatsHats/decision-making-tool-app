@@ -120,13 +120,26 @@ function drawDiagram(canvas, optionsArray) {
         context.strokeStyle = 'white';
         context.stroke();
         // title for sector
+        const angleTitle = 0.7;
         const middleSector = startSector + sectorSize / 2;
-        const textX = centerX + Math.cos(middleSector) * (radius / 2);
-        const textY = centerY + Math.sin(middleSector) * (radius / 2);
-        const textWidth = context.measureText(option.title).width;
+        const textX = centerX + Math.cos(middleSector) * (radius * angleTitle);
+        const textY = centerY + Math.sin(middleSector) * (radius * angleTitle);
+        let title = option.title;
+        while (context.measureText(title).width > radius * angleTitle) {
+            title = title.slice(0, -2) + '…';
+        }
+        context.textAlign = 'center';
+        context.textBaseline = 'middle';
+        context.font = '20px Birthstone-Regular';
+        // white text + black text
+        context.save();
+        context.translate(textX, textY);
+        context.rotate(middleSector);
+        context.fillStyle = 'white';
+        context.fillText(title, 0, 1);
         context.fillStyle = 'black';
-        context.font = '14px Birthstone-Regular';
-        context.fillText(option.title, textX - textWidth / 2, textY);
+        context.fillText(title, 0, 0);
+        context.restore();
         // start for next sector
         startSector = endSector;
         // center of the circle
