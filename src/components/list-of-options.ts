@@ -274,12 +274,12 @@ function createButtonSection(): HTMLElement {
   buttonSection.append(clearButton);
 
   const saveButton = document.createElement('button');
-  saveButton.textContent = 'Save list to file';
+  saveButton.textContent = 'Save list';
   saveButton.classList.add('saveButton', 'button');
   buttonSection.append(saveButton);
 
   const loadButton = document.createElement('button');
-  loadButton.textContent = 'Load list from file';
+  loadButton.textContent = 'Load list';
   loadButton.classList.add('loadButton', 'button');
   buttonSection.append(loadButton);
 
