@@ -67,7 +67,7 @@ export function createTable(): HTMLTableElement {
   titleTask.textContent = 'Task title';
 
   const weightTask = document.createElement('th');
-  weightTask.textContent = 'Task weight';
+  weightTask.textContent = 'Weight';
 
   const deleteTask = document.createElement('th');
   deleteTask.textContent = '';
@@ -86,9 +86,9 @@ export function createTable(): HTMLTableElement {
       );
     }
   } else {
-    tableBody.append(createRow(idOptionCount, '', ''));
-    idOptionCount += 1;
+    tableBody.append(createRow(1, '', ''));
   }
+  idOptionCount = tableBody.children.length + 1;
 
   return table;
 }
@@ -128,7 +128,7 @@ export function createRow(
 ): HTMLTableRowElement {
   const row = document.createElement('tr');
   const idCell = document.createElement('td');
-  idCell.textContent = id.toString();
+  idCell.textContent = `#${id}`;
 
   const titleCell = document.createElement('td');
   const titleInput = createInputElement('text', 'Title', title);
@@ -272,20 +272,21 @@ function createButtonSection(): HTMLElement {
   clearButton.textContent = 'Clear list';
   clearButton.classList.add('clearButton', 'button');
   buttonSection.append(clearButton);
+  clearButton.addEventListener('click', () => {
+    clearTable();
+  });
 
   const saveButton = document.createElement('button');
   saveButton.textContent = 'Save list';
   saveButton.classList.add('saveButton', 'button');
   buttonSection.append(saveButton);
+  saveButton.addEventListener('click', saveListToFile);
 
   const loadButton = document.createElement('button');
   loadButton.textContent = 'Load list';
   loadButton.classList.add('loadButton', 'button');
   buttonSection.append(loadButton);
-
-  clearButton.addEventListener('click', () => {
-    clearTable();
-  });
+  loadButton.addEventListener('click', loadListFromFile);
 
   return buttonSection;
 }
@@ -323,6 +324,71 @@ if (Array.isArray(savedOptions) && savedOptions.length > 0) {
 }
 
 window.addEventListener('beforeunload', () => {
-  console.log('Saving options...');
   storage.save(STORAGE_KEY, optionsArray);
 });
+
+function saveListToFile(): void {
+  if (optionsArray.length === 0) {
+    createAddValidOptionsModal();
+    return;
+  }
+
+  const json = JSON.stringify(optionsArray, undefined, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const downloadLink = document.createElement('a');
+
+  downloadLink.href = URL.createObjectURL(blob);
+  downloadLink.download = 'options_list.json';
+  downloadLink.click();
+}
+
+function loadListFromFile(): void {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'application/json'; // only json
+
+  input.addEventListener('change', async (event) => {
+    const inputElement = event.target;
+    if (
+      !(inputElement instanceof HTMLInputElement) ||
+      !inputElement.files?.length
+    ) {
+      return;
+    }
+
+    const file = inputElement.files[0];
+
+    try {
+      const result = await file.text();
+      const data = JSON.parse(result);
+
+      if (!Array.isArray(data)) {
+        return;
+      }
+
+      clearTable();
+      optionsArray = data;
+      savedOptions = [...optionsArray];
+      idOptionCount = Math.max(...optionsArray.map((o) => o.id), 0) + 1;
+
+      if (!tableBody) {
+        tableBody = document.createElement('tbody');
+        const table = document.querySelector('.table');
+        table?.append(tableBody);
+      }
+
+      for (const option of optionsArray) {
+        const newRow = createRow(
+          option.id,
+          option.title,
+          option.weight.toString(),
+        );
+        tableBody.append(newRow);
+      }
+    } catch (error) {
+      console.error('error', error);
+    }
+  });
+
+  input.click();
+}

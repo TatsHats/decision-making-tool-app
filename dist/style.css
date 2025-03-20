@@ -18,9 +18,9 @@ body {
   background-image: url('./assets/img/1.png');
   background-position: left top;
   background-repeat: no-repeat;
-  background-size: cover;
-  height: 90vh;
-  max-width: 900px;
+  background-size: 800px auto;
+  height: auto;
+  width: 800px;
   border: 1px solid black;
   box-shadow: 10px 0 20px rgba(0, 0, 0, 0.5), 0 10px 20px rgba(0, 0, 0, 0.5);
 }
@@ -35,7 +35,7 @@ body {
   cursor: pointer;
   display: flex;
   justify-content: center;
-  background-color: transparent;
+  background-color: rgba(255, 255, 255, 0.5);
   transition: all 0.3s ease;
   min-width: 160px;
 }
@@ -47,12 +47,12 @@ body {
 .listSection {
   display: flex;
   flex-direction: column;
-  margin: 160px 0 0 125px;
+  margin: 140px 0 0 100px;
 }
 
 .titleApp {
-  font-size: 3rem;
-  margin: 30px 55px 5px;
+  font-size: 2.7rem;
+  margin: 30px 55px 0;
 }
 
 .table {
@@ -93,16 +93,16 @@ body {
   width: 30px;
 }
 .table th:nth-child(2) {
-  width: 220px;
+  width: 205px;
 }
 .table th:nth-child(3) {
-  width: 100px;
+  width: 60px;
 }
 .title-input {
-  width: 210px;
+  width: 195px;
 }
 .weight-input {
-  width: 80px;
+  width: 50px;
 }
 
 .table-input:focus {
@@ -145,16 +145,16 @@ body {
 }
 
 .sectionPicker {
+  margin: 10px auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   background-image: url('./assets/img/1.png');
   background-position: left top;
   background-repeat: no-repeat;
-  background-size: cover;
+  background-size: 800px auto;
   position: relative;
-  height: 90vh;
-  width: 770px;
+  width: 800px;
   color: white;
   border: 1px solid black;
   box-shadow: 10px 0 20px rgba(0, 0, 0, 0.5), 0 10px 20px rgba(0, 0, 0, 0.5);
@@ -244,7 +244,7 @@ body {
   width: 30px;
   height: auto;
   position: absolute;
-  top: 42.5%;
+  top: 46.5%;
   left: 48%;
   z-index: 100;
 }
@@ -356,16 +356,17 @@ body {
 @media (max-width: 810px) {
   .appContainer {
     flex-direction: column-reverse;
+    justify-content: center;
     width: 700px;
   }
 
   .listSection {
-    margin: 20px 0 0 125px;
+    margin: 0 0 0 102px;
   }
 
   .buttonSection {
     flex-direction: row;
-    padding: 20px;
+    padding: 70px 20px 0;
   }
 
   .buttonSection .button {
@@ -374,10 +375,17 @@ body {
     padding: 8px 12px;
     min-width: 100px;
   }
+
+  .sectionPicker {
+    width: 700px;
+  }
 }
 
 @media (max-width: 710px) {
   .appContainer {
+    width: 600px;
+  }
+  .sectionPicker {
     width: 600px;
   }
 }

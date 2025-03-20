@@ -1,3 +1,12 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var _a;
 import { Page, changePage } from '../router.js';
 import { createPasteListModal } from './paste-list-modal.js';
@@ -46,7 +55,7 @@ export function createTable() {
     const titleTask = document.createElement('th');
     titleTask.textContent = 'Task title';
     const weightTask = document.createElement('th');
-    weightTask.textContent = 'Task weight';
+    weightTask.textContent = 'Weight';
     const deleteTask = document.createElement('th');
     deleteTask.textContent = '';
     headerRow.append(idTask, titleTask, weightTask, deleteTask);
@@ -60,9 +69,9 @@ export function createTable() {
         }
     }
     else {
-        tableBody.append(createRow(idOptionCount, '', ''));
-        idOptionCount += 1;
+        tableBody.append(createRow(1, '', ''));
     }
+    idOptionCount = tableBody.children.length + 1;
     return table;
 }
 // createAddOptionSection
@@ -91,7 +100,7 @@ function createAddStartButtonSection() {
 export function createRow(id, title = '', weight = '') {
     const row = document.createElement('tr');
     const idCell = document.createElement('td');
-    idCell.textContent = id.toString();
+    idCell.textContent = `#${id}`;
     const titleCell = document.createElement('td');
     const titleInput = createInputElement('text', 'Title', title);
     titleInput.classList.add('title-input');
@@ -194,17 +203,19 @@ function createButtonSection() {
     clearButton.textContent = 'Clear list';
     clearButton.classList.add('clearButton', 'button');
     buttonSection.append(clearButton);
+    clearButton.addEventListener('click', () => {
+        clearTable();
+    });
     const saveButton = document.createElement('button');
     saveButton.textContent = 'Save list';
     saveButton.classList.add('saveButton', 'button');
     buttonSection.append(saveButton);
+    saveButton.addEventListener('click', saveListToFile);
     const loadButton = document.createElement('button');
     loadButton.textContent = 'Load list';
     loadButton.classList.add('loadButton', 'button');
     buttonSection.append(loadButton);
-    clearButton.addEventListener('click', () => {
-        clearTable();
-    });
+    loadButton.addEventListener('click', loadListFromFile);
     return buttonSection;
 }
 function saveOptions() {
@@ -234,6 +245,55 @@ else {
     idOptionCount = 1;
 }
 window.addEventListener('beforeunload', () => {
-    console.log('Saving options...');
     storage.save(STORAGE_KEY, optionsArray);
 });
+function saveListToFile() {
+    if (optionsArray.length === 0) {
+        createAddValidOptionsModal();
+        return;
+    }
+    const json = JSON.stringify(optionsArray, undefined, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const downloadLink = document.createElement('a');
+    downloadLink.href = URL.createObjectURL(blob);
+    downloadLink.download = 'options_list.json';
+    downloadLink.click();
+}
+function loadListFromFile() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'application/json'; // only json
+    input.addEventListener('change', (event) => __awaiter(this, void 0, void 0, function* () {
+        var _a;
+        const inputElement = event.target;
+        if (!(inputElement instanceof HTMLInputElement) ||
+            !((_a = inputElement.files) === null || _a === void 0 ? void 0 : _a.length)) {
+            return;
+        }
+        const file = inputElement.files[0];
+        try {
+            const result = yield file.text();
+            const data = JSON.parse(result);
+            if (!Array.isArray(data)) {
+                return;
+            }
+            clearTable();
+            optionsArray = data;
+            savedOptions = [...optionsArray];
+            idOptionCount = Math.max(...optionsArray.map((o) => o.id), 0) + 1;
+            if (!tableBody) {
+                tableBody = document.createElement('tbody');
+                const table = document.querySelector('.table');
+                table === null || table === void 0 ? void 0 : table.append(tableBody);
+            }
+            for (const option of optionsArray) {
+                const newRow = createRow(option.id, option.title, option.weight.toString());
+                tableBody.append(newRow);
+            }
+        }
+        catch (error) {
+            console.error('error', error);
+        }
+    }));
+    input.click();
+}

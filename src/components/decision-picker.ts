@@ -218,38 +218,83 @@ function playSound(soundType: SoundType): void {
 }
 
 function playAnimation(canvas: HTMLCanvasElement, duration: number): void {
-  if (duration < 5) {
-    return alert('The duration must be at least 5 seconds!');
-  }
-
   playSound(SoundType.Start);
-
-  const startAngle = Math.random() * 360;
-  const totalRotation = 360 * 5 + Math.random() * 3600;
-
-  canvas.style.transition = `transform ${duration}s ease-out`;
-  canvas.style.transform = `rotate(${startAngle + totalRotation}deg)`;
-  console.log(`${totalRotation} -||- ${canvas.style.transform}`);
-
-  const endAngle = (startAngle + totalRotation) % 360;
+  canvas.style.transition = 'none';
+  canvas.style.transform = 'rotate(0deg)';
 
   setTimeout(() => {
-    playSound(SoundType.Finish);
-    updateInfoField(infoField, endAngle);
-  }, duration * 1000);
+    const rotations = 5 + Math.random();
+    const totalRotation = rotations * 360;
+    const finalAngle = totalRotation;
+    let animationCompleted = false;
+
+    canvas.style.willChange = 'transform';
+    canvas.style.transition = `transform ${duration}s ease-out`;
+    canvas.style.transform = `rotate(${finalAngle}deg)`;
+
+    const updateTitle = (): void => {
+      if (animationCompleted) return;
+
+      const computedStyle = globalThis.getComputedStyle(canvas);
+      const matrix = new DOMMatrix(computedStyle.transform);
+      let currentAngle = Math.round(
+        Math.atan2(matrix.b, matrix.a) * (180 / Math.PI),
+      );
+
+      if (currentAngle < 0) currentAngle += 360;
+      updateInfoField(infoField, currentAngle);
+
+      requestAnimationFrame(updateTitle);
+    };
+
+    requestAnimationFrame(updateTitle);
+
+    const end = (): void => {
+      animationCompleted = true;
+      canvas.removeEventListener('transitionend', end);
+
+      const computedStyle = globalThis.getComputedStyle(canvas);
+      const matrix = new DOMMatrix(computedStyle.transform);
+      let finalComputedAngle = Math.round(
+        Math.atan2(matrix.b, matrix.a) * (180 / Math.PI),
+      );
+
+      if (finalComputedAngle < 0) finalComputedAngle += 360;
+
+      playSound(SoundType.Finish);
+      updateInfoField(infoField, finalComputedAngle);
+    };
+
+    canvas.addEventListener('transitionend', end);
+  }, 50);
 }
 
 function updateInfoField(infoField: HTMLSpanElement, rotation: number): void {
   const totalWeight = getTotalWeight(optionsArray);
   let startSector = 0;
-  const radian = (rotation % 360) * (Math.PI / 180);
+  const radian = ((rotation % 360) * Math.PI) / 180;
 
   for (const option of optionsArray) {
-    const sectorSize = Math.PI * 2 * (option.weight / totalWeight);
+    const sectorSize = (Math.PI * 2 * option.weight) / totalWeight;
     const endSector = startSector + sectorSize;
 
     if (radian >= startSector && radian < endSector) {
-      infoField.textContent = `${option.title}`;
+      infoField.textContent = option.title;
+      infoField.style.transition = '0.5s ease-in-out';
+      infoField.style.textShadow = '0 0 5px white';
+      let toggle = false;
+
+      const blinkInterval = setInterval(() => {
+        infoField.style.textShadow = toggle
+          ? '0 0 5px white'
+          : '0 0 15px white';
+        toggle = !toggle;
+      }, 500);
+
+      setTimeout(() => {
+        clearInterval(blinkInterval);
+        infoField.style.textShadow = '';
+      }, 7000);
       break;
     }
 
